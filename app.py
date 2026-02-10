@@ -2,32 +2,51 @@ import streamlit as st
 import plotly.graph_objects as go
 
 # ---------------- PAGE CONFIG ----------------
-st.set_page_config(page_title="Reality Shield", layout="wide")
+st.set_page_config(
+    page_title="Reality Shield",
+    page_icon="🛡️",
+    layout="wide"
+)
 
-# ---------------- MOBILE UI CSS ----------------
+# ---------------- MOBILE-FIRST CSS ----------------
 st.markdown("""
 <style>
 .block-container {
-    padding-top: 1.2rem;
+    padding-top: 1rem;
     padding-bottom: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
+
+h1, h2, h3 {
+    text-align: center;
+}
+
 textarea, input {
     font-size: 16px !important;
 }
+
 button {
-    width: 100%;
-    font-size: 18px;
+    width: 100% !important;
+    font-size: 18px !important;
+    padding: 0.6rem !important;
+    border-radius: 10px !important;
 }
+
+div[data-testid="stMetric"] {
+    text-align: center;
+}
+
 @media (max-width: 768px) {
     .block-container {
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
     }
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- SPEEDOMETER FUNCTION ----------------
+# ---------------- SPEEDOMETER ----------------
 def speedometer(title, value):
     fig = go.Figure(
         go.Indicator(
@@ -36,7 +55,7 @@ def speedometer(title, value):
             title={"text": title},
             gauge={
                 "axis": {"range": [0, 100]},
-                "bar": {"color": "black"},
+                "bar": {"color": "#222"},
                 "steps": [
                     {"range": [0, 40], "color": "#8fd19e"},
                     {"range": [40, 70], "color": "#ffe066"},
@@ -48,32 +67,33 @@ def speedometer(title, value):
     st.plotly_chart(fig, use_container_width=True)
 
 # ---------------- HEADER ----------------
-st.markdown(
-    """
-    <h1 style='text-align:center;'>🛡️ Reality Shield</h1>
-    <p style='text-align:center; color:gray;'>
-    MindGuard • EchoTrace • TruthLens
-    </p>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<h1>🛡️ Reality Shield</h1>
+<p style='text-align:center; color:gray;'>
+MindGuard • EchoTrace • TruthLens
+</p>
+""", unsafe_allow_html=True)
 
-st.markdown("---")
+st.divider()
 
-tab1, tab2, tab3 = st.tabs(["🧠 MindGuard", "🔍 EchoTrace", "🧪 TruthLens"])
+tab1, tab2, tab3 = st.tabs([
+    "🧠 MindGuard",
+    "🔍 EchoTrace",
+    "🧪 TruthLens"
+])
 
-# ===================== MINDGUARD =====================
+# ================= MINDGUARD =================
 with tab1:
-    st.subheader("🧠 MindGuard – Stress & Burnout Analyzer")
+    st.subheader("Stress & Burnout Analyzer")
 
     text = st.text_area(
-        "Describe how you are feeling",
-        height=160,
-        placeholder="Example: I feel exhausted, anxious, and overwhelmed with studies"
+        "How are you feeling?",
+        height=150,
+        placeholder="Example: I feel stressed, tired and overwhelmed with studies"
     )
 
-    if st.button("Analyze Mental State", use_container_width=True):
-        if text.strip() == "":
+    if st.button("Analyze Mental State"):
+        if not text.strip():
             st.warning("Please enter some text.")
         else:
             keywords = [
@@ -90,56 +110,56 @@ with tab1:
 
             if stress >= 70:
                 st.error("High stress detected")
-                st.info("Suggestion: Take rest, reduce workload, talk to someone you trust.")
+                st.info("Suggestion: Take rest, reduce workload, talk to someone.")
             elif stress >= 40:
                 st.warning("Moderate stress detected")
-                st.info("Suggestion: Take breaks, sleep well, plan tasks.")
+                st.info("Suggestion: Take breaks and manage time well.")
             else:
                 st.success("Low stress detected")
                 st.info("Suggestion: Maintain healthy habits.")
 
-# ===================== ECHOTRACE =====================
+# ================= ECHOTRACE =================
 with tab2:
-    st.subheader("🔍 EchoTrace – Source Reliability Analyzer")
+    st.subheader("Source Reliability Checker")
 
     source = st.text_input(
-        "Enter news source / platform",
-        placeholder="Example: WhatsApp forward, unknown website"
+        "Enter source or platform",
+        placeholder="Example: WhatsApp forward"
     )
 
-    if st.button("Analyze Source", use_container_width=True):
-        if source.strip() == "":
+    if st.button("Analyze Source"):
+        if not source.strip():
             st.warning("Please enter a source.")
         else:
-            risky_sources = ["whatsapp", "forward", "telegram", "unknown"]
-            risk = sum(1 for r in risky_sources if r in source.lower())
+            risky = ["whatsapp", "forward", "telegram", "unknown"]
+            risk_score = sum(1 for r in risky if r in source.lower())
 
-            reliability = max(85 - risk * 20, 30)
+            reliability = max(85 - risk_score * 20, 30)
 
             speedometer("Source Reliability (%)", reliability)
 
             if reliability < 50:
                 st.error("Low reliability source")
-                st.info("Suggestion: Cross-check with trusted news websites.")
+                st.info("Suggestion: Verify with trusted news sites.")
             elif reliability < 75:
-                st.warning("Moderate reliability source")
-                st.info("Suggestion: Verify information before sharing.")
+                st.warning("Moderate reliability")
+                st.info("Suggestion: Cross-check before sharing.")
             else:
                 st.success("High reliability source")
                 st.info("Suggestion: Source appears trustworthy.")
 
-# ===================== TRUTHLENS =====================
+# ================= TRUTHLENS =================
 with tab3:
-    st.subheader("🧪 TruthLens – Claim Credibility Checker")
+    st.subheader("Claim Credibility Checker")
 
     claim = st.text_area(
-        "Enter a claim to verify",
-        height=160,
-        placeholder="Example: Drinking hot water cures viral infections"
+        "Enter a claim",
+        height=150,
+        placeholder="Example: This method guarantees 100% instant results"
     )
 
-    if st.button("Verify Claim", use_container_width=True):
-        if claim.strip() == "":
+    if st.button("Verify Claim"):
+        if not claim.strip():
             st.warning("Please enter a claim.")
         else:
             flags = ["always", "never", "100%", "guaranteed", "instantly"]
@@ -159,5 +179,5 @@ with tab3:
                 st.success("Likely true")
                 st.info("Suggestion: Information appears reliable.")
 
-st.markdown("---")
-st.caption("⚠️ Disclaimer: This tool is for awareness and educational purposes only.")
+st.divider()
+st.caption("⚠️ For awareness and educational purposes only.")
