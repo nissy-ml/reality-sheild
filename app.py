@@ -1,5 +1,4 @@
 import streamlit as st
-from textblob import TextBlob
 import random
 
 st.set_page_config(page_title="Reality Shield", layout="wide")
@@ -21,22 +20,24 @@ with tab1:
         if text.strip() == "":
             st.warning("Please enter your thoughts.")
         else:
-            polarity = TextBlob(text).sentiment.polarity
-            stress = int((1 - polarity) * 50)
-            burnout = int(stress * 0.9)
+            keywords = ["stress", "tired", "exhausted", "burnout", "pressure", "anxious"]
+            score = sum(1 for k in keywords if k in text.lower())
+
+            stress = min(20 + score * 15, 95)
+            burnout = min(stress - 5, 90)
 
             st.write(f"🔴 **Stress Level:** {stress}%")
             st.write(f"🟠 **Burnout Risk:** {burnout}%")
 
             if stress > 70:
                 st.error("High stress detected")
-                st.info("💡 Suggestion: Take rest, talk to someone you trust, reduce workload.")
+                st.info("💡 Suggestion: Take rest, reduce workload, talk to someone you trust.")
             elif stress > 40:
                 st.warning("Moderate stress detected")
-                st.info("💡 Suggestion: Take short breaks, improve sleep routine.")
+                st.info("💡 Suggestion: Take breaks, sleep well, manage time better.")
             else:
                 st.success("Low stress detected")
-                st.info("💡 Suggestion: Maintain your healthy habits.")
+                st.info("💡 Suggestion: Maintain healthy routines.")
 
 # ================= EchoTrace =================
 with tab2:
@@ -53,10 +54,10 @@ with tab2:
 
             if reliability < 50:
                 st.error("Low reliability source")
-                st.info("💡 Suggestion: Cross-check with trusted news platforms.")
+                st.info("💡 Suggestion: Cross-check with trusted platforms.")
             elif reliability < 75:
                 st.warning("Moderate reliability source")
-                st.info("💡 Suggestion: Verify claims before sharing.")
+                st.info("💡 Suggestion: Verify before sharing.")
             else:
                 st.success("High reliability source")
                 st.info("💡 Suggestion: Source appears trustworthy.")
@@ -78,8 +79,8 @@ with tab3:
                 st.error("Likely false or misleading")
                 st.info("💡 Suggestion: Do not share without verification.")
             elif credibility < 75:
-                st.warning("Partially true / unclear")
-                st.info("💡 Suggestion: Look for more reliable references.")
+                st.warning("Partially true or unclear")
+                st.info("💡 Suggestion: Look for reliable references.")
             else:
                 st.success("Likely true")
                 st.info("💡 Suggestion: Information appears reliable.")
