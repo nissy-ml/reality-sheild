@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------- MOBILE-FIRST CSS ----------------
+# ---------------- MOBILE-FIRST + COLORFUL CSS ----------------
 st.markdown("""
 <style>
 .block-container {
@@ -24,13 +24,17 @@ h1, h2, h3 {
 
 textarea, input {
     font-size: 16px !important;
+    border-radius: 10px;
+    border: 2px solid #0d3b66;
+    padding: 0.5rem;
 }
 
 button {
     width: 100% !important;
     font-size: 18px !important;
     padding: 0.6rem !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
+    color: white !important;
 }
 
 div[data-testid="stMetric"] {
@@ -46,8 +50,16 @@ div[data-testid="stMetric"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- SPEEDOMETER ----------------
-def speedometer(title, value):
+# ---------------- SPEEDOMETER WITH MODULE COLORS ----------------
+def speedometer(title, value, module="default"):
+    colors = {
+        "mind": ["#8fd19e", "#b0e57c", "#22aa33"],      # green shades
+        "echo": ["#fff59d", "#ffe066", "#ffb300"],      # yellow shades
+        "truth": ["#ff8a80", "#ff6b6b", "#d32f2f"],     # red shades
+        "default": ["#9be7a1", "#ffe066", "#ff6b6b"]    # default
+    }
+    step_colors = colors.get(module, colors["default"])
+    
     fig = go.Figure(
         go.Indicator(
             mode="gauge+number",
@@ -55,12 +67,17 @@ def speedometer(title, value):
             title={"text": title},
             gauge={
                 "axis": {"range": [0, 100]},
-                "bar": {"color": "#222"},
+                "bar": {"color": step_colors[2]},
                 "steps": [
-                    {"range": [0, 40], "color": "#8fd19e"},
-                    {"range": [40, 70], "color": "#ffe066"},
-                    {"range": [70, 100], "color": "#ff6b6b"},
+                    {"range": [0, 40], "color": step_colors[0]},
+                    {"range": [40, 70], "color": step_colors[1]},
+                    {"range": [70, 100], "color": step_colors[2]},
                 ],
+                "threshold": {
+                    "line": {"color": "black", "width": 4},
+                    "thickness": 0.75,
+                    "value": value
+                }
             }
         )
     )
@@ -68,10 +85,11 @@ def speedometer(title, value):
 
 # ---------------- HEADER ----------------
 st.markdown("""
-<h1>🛡️ Reality Shield</h1>
-<p style='text-align:center; color:gray;'>
-MindGuard • EchoTrace • TruthLens
-</p>
+<div style="background: linear-gradient(90deg, #8fd19e, #ffe066, #ff6b6b); 
+            padding: 1.5rem; border-radius: 10px; text-align:center; color:white; font-size:2.2rem; font-weight:bold;">
+🛡️ Reality Shield
+</div>
+<p style='text-align:center; color:#555;'>MindGuard • EchoTrace • TruthLens</p>
 """, unsafe_allow_html=True)
 
 st.divider()
@@ -105,8 +123,8 @@ with tab1:
             stress = min(30 + score * 10, 95)
             burnout = max(stress - 10, 0)
 
-            speedometer("Stress Level (%)", stress)
-            speedometer("Burnout Risk (%)", burnout)
+            speedometer("Stress Level (%)", stress, module="mind")
+            speedometer("Burnout Risk (%)", burnout, module="mind")
 
             if stress >= 70:
                 st.error("High stress detected")
@@ -136,7 +154,7 @@ with tab2:
 
             reliability = max(85 - risk_score * 20, 30)
 
-            speedometer("Source Reliability (%)", reliability)
+            speedometer("Source Reliability (%)", reliability, module="echo")
 
             if reliability < 50:
                 st.error("Low reliability source")
@@ -167,7 +185,7 @@ with tab3:
 
             credibility = max(90 - flag_score * 18, 35)
 
-            speedometer("Credibility Score (%)", credibility)
+            speedometer("Credibility Score (%)", credibility, module="truth")
 
             if credibility < 50:
                 st.error("Likely false or misleading")
