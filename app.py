@@ -1,9 +1,53 @@
 import streamlit as st
-import random
+import plotly.graph_objects as go
 
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Reality Shield", layout="wide")
 
-# ---------- HEADER ----------
+# ---------------- MOBILE UI CSS ----------------
+st.markdown("""
+<style>
+.block-container {
+    padding-top: 1.2rem;
+    padding-bottom: 2rem;
+}
+textarea, input {
+    font-size: 16px !important;
+}
+button {
+    width: 100%;
+    font-size: 18px;
+}
+@media (max-width: 768px) {
+    .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------- SPEEDOMETER FUNCTION ----------------
+def speedometer(title, value):
+    fig = go.Figure(
+        go.Indicator(
+            mode="gauge+number",
+            value=value,
+            title={"text": title},
+            gauge={
+                "axis": {"range": [0, 100]},
+                "bar": {"color": "black"},
+                "steps": [
+                    {"range": [0, 40], "color": "#8fd19e"},
+                    {"range": [40, 70], "color": "#ffe066"},
+                    {"range": [70, 100], "color": "#ff6b6b"},
+                ],
+            }
+        )
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+# ---------------- HEADER ----------------
 st.markdown(
     """
     <h1 style='text-align:center;'>🛡️ Reality Shield</h1>
@@ -16,21 +60,19 @@ st.markdown(
 
 st.markdown("---")
 
-tab1, tab2, tab3 = st.tabs(
-    ["🧠 MindGuard", "🔍 EchoTrace", "🧪 TruthLens"]
-)
+tab1, tab2, tab3 = st.tabs(["🧠 MindGuard", "🔍 EchoTrace", "🧪 TruthLens"])
 
-# ================= MINDGUARD =================
+# ===================== MINDGUARD =====================
 with tab1:
     st.subheader("🧠 MindGuard – Stress & Burnout Analyzer")
 
     text = st.text_area(
         "Describe how you are feeling",
         height=160,
-        placeholder="Example: I feel exhausted, anxious, and overwhelmed with studies..."
+        placeholder="Example: I feel exhausted, anxious, and overwhelmed with studies"
     )
 
-    if st.button("Analyze Mental State"):
+    if st.button("Analyze Mental State", use_container_width=True):
         if text.strip() == "":
             st.warning("Please enter some text.")
         else:
@@ -40,59 +82,53 @@ with tab1:
             ]
             score = sum(1 for k in keywords if k in text.lower())
 
-            stress = min(25 + score * 12, 95)
-            burnout = min(stress - 10, 90)
+            stress = min(30 + score * 10, 95)
+            burnout = max(stress - 10, 0)
 
-            st.markdown("### 📊 Results")
-            st.write(f"**Stress Level:** {stress}%")
-            st.progress(stress/100)
+            speedometer("Stress Level (%)", stress)
+            speedometer("Burnout Risk (%)", burnout)
 
-            st.write(f"**Burnout Risk:** {burnout}%")
-            st.progress(burnout/100)
-
-            if stress > 70:
+            if stress >= 70:
                 st.error("High stress detected")
-                st.info("💡 Suggestion: Take rest, reduce workload, talk to someone you trust.")
-            elif stress > 40:
+                st.info("Suggestion: Take rest, reduce workload, talk to someone you trust.")
+            elif stress >= 40:
                 st.warning("Moderate stress detected")
-                st.info("💡 Suggestion: Take breaks, sleep well, plan tasks.")
+                st.info("Suggestion: Take breaks, sleep well, plan tasks.")
             else:
                 st.success("Low stress detected")
-                st.info("💡 Suggestion: Maintain healthy habits.")
+                st.info("Suggestion: Maintain healthy habits.")
 
-# ================= ECHOTRACE =================
+# ===================== ECHOTRACE =====================
 with tab2:
     st.subheader("🔍 EchoTrace – Source Reliability Analyzer")
 
     source = st.text_input(
-        "Enter news source / URL / platform",
-        placeholder="Example: WhatsApp forward, unknown website, news portal"
+        "Enter news source / platform",
+        placeholder="Example: WhatsApp forward, unknown website"
     )
 
-    if st.button("Analyze Source"):
+    if st.button("Analyze Source", use_container_width=True):
         if source.strip() == "":
             st.warning("Please enter a source.")
         else:
-            suspicious = ["whatsapp", "forward", "unknown", "telegram"]
-            risk = sum(1 for s in suspicious if s in source.lower())
+            risky_sources = ["whatsapp", "forward", "telegram", "unknown"]
+            risk = sum(1 for r in risky_sources if r in source.lower())
 
             reliability = max(85 - risk * 20, 30)
 
-            st.markdown("### 📊 Results")
-            st.write(f"**Source Reliability:** {reliability}%")
-            st.progress(reliability/100)
+            speedometer("Source Reliability (%)", reliability)
 
             if reliability < 50:
                 st.error("Low reliability source")
-                st.info("💡 Suggestion: Cross-check with trusted news websites.")
+                st.info("Suggestion: Cross-check with trusted news websites.")
             elif reliability < 75:
                 st.warning("Moderate reliability source")
-                st.info("💡 Suggestion: Verify information before sharing.")
+                st.info("Suggestion: Verify information before sharing.")
             else:
                 st.success("High reliability source")
-                st.info("💡 Suggestion: Source appears trustworthy.")
+                st.info("Suggestion: Source appears trustworthy.")
 
-# ================= TRUTHLENS =================
+# ===================== TRUTHLENS =====================
 with tab3:
     st.subheader("🧪 TruthLens – Claim Credibility Checker")
 
@@ -102,7 +138,7 @@ with tab3:
         placeholder="Example: Drinking hot water cures viral infections"
     )
 
-    if st.button("Verify Claim"):
+    if st.button("Verify Claim", use_container_width=True):
         if claim.strip() == "":
             st.warning("Please enter a claim.")
         else:
@@ -111,19 +147,17 @@ with tab3:
 
             credibility = max(90 - flag_score * 18, 35)
 
-            st.markdown("### 📊 Results")
-            st.write(f"**Credibility Score:** {credibility}%")
-            st.progress(credibility/100)
+            speedometer("Credibility Score (%)", credibility)
 
             if credibility < 50:
                 st.error("Likely false or misleading")
-                st.info("💡 Suggestion: Do not share without verification.")
+                st.info("Suggestion: Do not share without verification.")
             elif credibility < 75:
                 st.warning("Partially true or unclear")
-                st.info("💡 Suggestion: Check reliable references.")
+                st.info("Suggestion: Check reliable references.")
             else:
                 st.success("Likely true")
-                st.info("💡 Suggestion: Information appears reliable.")
+                st.info("Suggestion: Information appears reliable.")
 
 st.markdown("---")
-st.caption("⚠️ Disclaimer: This tool provides heuristic-based analysis for awareness, not medical or legal advice.")
+st.caption("⚠️ Disclaimer: This tool is for awareness and educational purposes only.")
