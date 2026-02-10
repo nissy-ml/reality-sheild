@@ -45,10 +45,10 @@ with tab1:
 
             st.markdown("### 📊 Results")
             st.write(f"**Stress Level:** {stress}%")
-            st.progress(stress)
+            st.progress(stress/100)
 
             st.write(f"**Burnout Risk:** {burnout}%")
-            st.progress(burnout)
+            st.progress(burnout/100)
 
             if stress > 70:
                 st.error("High stress detected")
@@ -80,7 +80,7 @@ with tab2:
 
             st.markdown("### 📊 Results")
             st.write(f"**Source Reliability:** {reliability}%")
-            st.progress(reliability)
+            st.progress(reliability/100)
 
             if reliability < 50:
                 st.error("Low reliability source")
@@ -113,7 +113,7 @@ with tab3:
 
             st.markdown("### 📊 Results")
             st.write(f"**Credibility Score:** {credibility}%")
-            st.progress(credibility)
+            st.progress(credibility/100)
 
             if credibility < 50:
                 st.error("Likely false or misleading")
